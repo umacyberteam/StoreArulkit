@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{color-scheme:light;--ink:#101426;--muted:#71778b;--line:#e8eaf2;--violet:#7657f6}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f8f9fc;color:var(--ink);font-family:'DM Sans',sans-serif}
+h1,h2,h3,h4,.brand{font-family:'Plus Jakarta Sans',sans-serif}
+a{text-decoration:none;color:inherit}
+button,input{font:inherit}
+.container{width:min(1160px,calc(100% - 40px));margin-inline:auto}
+.glass{background:rgba(255,255,255,.86);backdrop-filter:blur(16px)}
+.hero-bg{background:radial-gradient(ellipse at 78% 20%,rgba(135,111,255,.16),transparent 34%),radial-gradient(ellipse at 10% 100%,rgba(83,195,255,.10),transparent 32%),#fff}
+.product-card{transition:transform .2s ease,box-shadow .2s ease}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(22,26,55,.10)}
+.pill{border:1px solid #e8e7ff;background:#f4f1ff;color:#7053ed}
+.btn-primary{background:linear-gradient(135deg,#8067ff,#6547ed);color:white;box-shadow:0 8px 18px rgba(118,87,246,.22)}
+.btn-primary:hover{filter:brightness(1.04)}
+.grid-dots{background-image:radial-gradient(#dcd9f8 1px,transparent 1px);background-size:16px 16px}
+
+
+/* First-visit intro loader */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 24px 16px;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(119, 87, 246, .22), transparent 48%),
+    #101225;
+  color: #fff;
+  animation: intro-fade-in .35s ease both;
+}
+.intro-content { width: min(100%, 540px); margin: auto; }
+.intro-brand { display: flex; align-items: center; justify-content: center; gap: 11px; margin-bottom: 24px; font-size: 19px; font-weight: 800; letter-spacing: -.04em; }
+.intro-brand b { color: #a99aff; }
+.intro-logo { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 15px; background: #7657f6; box-shadow: 0 10px 35px rgba(118,87,246,.3); }
+.intro-video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(255,255,255,.13); border-radius: 22px; background: #1c1d35; box-shadow: 0 25px 80px rgba(0,0,0,.32); }
+.intro-video { width: 100%; height: 100%; object-fit: contain; background: #090a15; }
+.intro-video-tag { position: absolute; left: 14px; bottom: 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(12,13,29,.62); padding: 7px 10px; font-size: 9px; font-weight: 800; letter-spacing: .15em; backdrop-filter: blur(12px); }
+.intro-sound-button { position: absolute; right: 12px; bottom: 12px; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; background: rgba(12,13,29,.62); color: #fff; backdrop-filter: blur(12px); }
+.intro-video-placeholder { display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: #b7aaff; background: radial-gradient(ellipse at center, rgba(118,87,246,.22), transparent 65%); font-weight: 800; }
+.intro-video-placeholder small { color: #9699b4; font-size: 11px; font-weight: 500; }
+.intro-loading-row { display: flex; justify-content: space-between; gap: 16px; margin-top: 22px; color: #c8c9dc; font-size: 12px; font-weight: 600; }
+.intro-percent { color: #fff; font-variant-numeric: tabular-nums; }
+.intro-progress-track { height: 5px; margin-top: 10px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.11); }
+.intro-progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7657f6, #b8a8ff); box-shadow: 0 0 18px rgba(145,119,255,.55); transition: width .2s ease; }
+.intro-footer { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 18px; color: #777b9a; font-size: 11px; }
+.intro-spinner { animation: intro-spin 1s linear infinite; }
+@keyframes intro-spin { to { transform: rotate(360deg); } }
+@keyframes intro-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 520px) {
+  .intro-content { width: min(100%, 440px); }
+  .intro-video-frame { border-radius: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay { animation: none; }
+  .intro-spinner { animation-duration: 3s; }
+}
