@@ -1,12 +1,214 @@
+
 "use client";
-import { useState } from "react";
+
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Code2, ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase";
-export default function LoginPage(){
- const [mode,setMode]=useState<"login"|"signup">("login");const [email,setEmail]=useState("");const [password,setPassword]=useState("");const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");
- const router=useRouter();const params=useSearchParams();
- async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setMessage("");try{const supabase=createClient();const result=mode==="login"?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password,options:{emailRedirectTo:`${location.origin}/auth/callback`}});if(result.error)throw result.error;if(mode==="signup"){setMessage("Pendaftaran berhasil. Cek email untuk verifikasi jika diminta.");}else{router.push(params.get("next")||"/");router.refresh();}}catch(err){setMessage(err instanceof Error?err.message:"Gagal autentikasi.");}finally{setBusy(false)}}
- async function google(){setBusy(true);setMessage("");try{const supabase=createClient();const {error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:`${location.origin}/auth/callback?next=${encodeURIComponent(params.get("next")||"/")}`}});if(error)throw error;}catch(err){setMessage(err instanceof Error?err.message:"Google login gagal.");setBusy(false)}}
- return <main className="hero-bg flex min-h-screen items-center justify-center px-4 py-10"><div className="w-full max-w-md"><a href="/" className="mb-7 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-violet"><ArrowLeft size={16}/> Kembali ke toko</a><div className="rounded-[28px] border border-white bg-white p-7 shadow-soft sm:p-9"><a href="/" className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet text-white"><Code2/></span><span className="brand text-lg font-extrabold">ArulKit <span className="text-violet">Store</span></span></a><h1 className="mt-8 text-2xl font-extrabold">{mode==="login"?"Masuk ke akun lu":"Bikin akun baru"}</h1><p className="mt-2 text-sm leading-6 text-slate-500">Masuk untuk mengelola pesanan dan mengakses produk digital yang sudah dibeli.</p><button onClick={google} disabled={busy} className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3.5 text-sm font-bold hover:bg-slate-50 disabled:opacity-50"><span className="text-lg font-extrabold">G</span> Lanjutkan dengan Google</button><div className="my-5 flex items-center gap-3 text-xs text-slate-400"><span className="h-px flex-1 bg-slate-200"/>atau email<span className="h-px flex-1 bg-slate-200"/></div><form onSubmit={submit} className="space-y-4"><label className="block text-sm font-bold">Email<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100" placeholder="nama@email.com"/></label><label className="block text-sm font-bold">Password<input required minLength={6} type="password" value={password} onChange={e=>setPassword(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100" placeholder="Minimal 6 karakter"/></label><button disabled={busy} className="btn-primary w-full rounded-xl px-4 py-3.5 text-sm font-extrabold disabled:opacity-50">{busy?"Memproses...":mode==="login"?"Masuk":"Daftar"}</button></form>{message&&<p role="status" className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">{message}</p>}<p className="mt-5 text-center text-sm text-slate-500">{mode==="login"?"Belum punya akun?":"Sudah punya akun?"} <button onClick={()=>{setMode(mode==="login"?"signup":"login");setMessage("")}} className="font-extrabold text-violet">{mode==="login"?"Daftar":"Masuk"}</button></p></div><p className="mt-5 text-center text-xs text-slate-400">Autentikasi menggunakan Supabase. Konfigurasi project diperlukan.</p></div></main>
+
+function LoginContent() {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const router = useRouter();
+  const params = useSearchParams();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMessage("");
+
+    try {
+      const supabase = createClient();
+
+      const result =
+        mode === "login"
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                emailRedirectTo: `${location.origin}/auth/callback`,
+              },
+            });
+
+      if (result.error) throw result.error;
+
+      if (mode === "signup") {
+        setMessage(
+          "Pendaftaran berhasil. Cek email untuk verifikasi jika diminta."
+        );
+      } else {
+        router.push(params.get("next") || "/");
+        router.refresh();
+      }
+    } catch (err) {
+      setMessage(
+        err instanceof Error ? err.message : "Gagal autentikasi."
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function google() {
+    setBusy(true);
+    setMessage("");
+
+    try {
+      const supabase = createClient();
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(
+            params.get("next") || "/"
+          )}`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      setMessage(
+        err instanceof Error ? err.message : "Google login gagal."
+      );
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main className="hero-bg flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <a
+          href="/"
+          className="mb-7 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-violet"
+        >
+          <ArrowLeft size={16} /> Kembali ke toko
+        </a>
+
+        <div className="rounded-[28px] border border-white bg-white p-7 shadow-soft sm:p-9">
+          <a href="/" className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet text-white">
+              <Code2 />
+            </span>
+            <span className="brand text-lg font-extrabold">
+              ArulKit <span className="text-violet">Store</span>
+            </span>
+          </a>
+
+          <h1 className="mt-8 text-2xl font-extrabold">
+            {mode === "login" ? "Masuk ke akun lu" : "Bikin akun baru"}
+          </h1>
+
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Masuk untuk mengelola pesanan dan mengakses produk digital yang
+            sudah dibeli.
+          </p>
+
+          <button
+            type="button"
+            onClick={google}
+            disabled={busy}
+            className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 px-4 py-3.5 text-sm font-bold hover:bg-slate-50 disabled:opacity-50"
+          >
+            <span className="text-lg font-extrabold">G</span>
+            Lanjutkan dengan Google
+          </button>
+
+          <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
+            <span className="h-px flex-1 bg-slate-200" />
+            atau email
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <form onSubmit={submit} className="space-y-4">
+            <label className="block text-sm font-bold">
+              Email
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                placeholder="nama@email.com"
+              />
+            </label>
+
+            <label className="block text-sm font-bold">
+              Password
+              <input
+                required
+                minLength={6}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                placeholder="Minimal 6 karakter"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="btn-primary w-full rounded-xl px-4 py-3.5 text-sm font-extrabold disabled:opacity-50"
+            >
+              {busy
+                ? "Memproses..."
+                : mode === "login"
+                  ? "Masuk"
+                  : "Daftar"}
+            </button>
+          </form>
+
+          {message && (
+            <p
+              role="status"
+              className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600"
+            >
+              {message}
+            </p>
+          )}
+
+          <p className="mt-5 text-center text-sm text-slate-500">
+            {mode === "login"
+              ? "Belum punya akun?"
+              : "Sudah punya akun?"}{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "login" ? "signup" : "login");
+                setMessage("");
+              }}
+              className="font-extrabold text-violet"
+            >
+              {mode === "login" ? "Daftar" : "Masuk"}
+            </button>
+          </p>
+        </div>
+
+        <p className="mt-5 text-center text-xs text-slate-400">
+          Autentikasi menggunakan Supabase.
+          <br />
+          Konfigurasi project diperlukan.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="hero-bg flex min-h-screen items-center justify-center px-4">
+          <p className="text-sm text-slate-500">Memuat halaman login...</p>
+        </main>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
 }
