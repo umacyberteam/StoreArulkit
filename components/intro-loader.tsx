@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Code2, LoaderCircle, Volume2, VolumeX } from "lucide-react";
 
 const VIDEO_URL = process.env.NEXT_PUBLIC_INTRO_VIDEO_URL || "/intro.mp4";
-const MAX_VIDEO_SECONDS = 15;
+const MAX_VIDEO_SECONDS = 17;
 
 export default function IntroLoader() {
   const [visible, setVisible] = useState(false);
