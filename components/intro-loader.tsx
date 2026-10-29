@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Code2, LoaderCircle, Volume2, VolumeX } from "lucide-react";
 
 const VIDEO_URL = process.env.NEXT_PUBLIC_INTRO_VIDEO_URL || "/intro.mp4";
-const MAX_VIDEO_SECONDS = 17;
 
 export default function IntroLoader() {
   const [visible, setVisible] = useState(false);
@@ -90,17 +89,43 @@ export default function IntroLoader() {
 
   if (!visible) return null;
 
-  const markVideoReady = (video: HTMLVideoElement) => {
-    if (Number.isFinite(video.duration) && video.duration > MAX_VIDEO_SECONDS) {
-      setVideoFailed(true);
-      setVideoReady(true);
-      return;
-    }
+  const markVideoReady = (_video: HTMLVideoElement) => {
     setVideoReady(true);
   };
 
+  const skipIntro = () => {
+    setProgress(100);
+    setExiting(true);
+    window.setTimeout(() => {
+      setVisible(false);
+      try { sessionStorage.setItem("arulkit-intro-seen", "1"); } catch {}
+    }, 750);
+  };
+
   return (
-    <div className="intro-overlay" role="status" aria-live="polite" aria-label="Memuat ArulKit Store" style={{ opacity: exiting ? 0 : 1, transition: "opacity 750ms ease" }}>
+    <div className="intro-overlay" role="status" aria-live="polite" aria-label="Memuat ArulKit Store" style={{ opacity: exiting ? 0 : 1, transition: "opacity 750ms ease-in-out", pointerEvents: exiting ? "none" : "auto", willChange: "opacity" }}>
+      <button
+        type="button"
+        onClick={skipIntro}
+        disabled={exiting}
+        style={{
+          position: "absolute",
+          top: 18,
+          right: 18,
+          zIndex: 30,
+          border: "1px solid rgba(255,255,255,0.3)",
+          borderRadius: 999,
+          padding: "9px 14px",
+          background: "rgba(15,15,25,0.75)",
+          color: "#fff",
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: exiting ? "default" : "pointer",
+          backdropFilter: "blur(8px)",
+        }}
+      >
+        Skip Intro
+      </button>
       <div className="intro-content">
         <div className="intro-brand">
           <span className="intro-logo"><Code2 size={23} /></span>
@@ -119,13 +144,6 @@ export default function IntroLoader() {
               onLoadedMetadata={async (event) => {
                 const video = event.currentTarget;
                 if (video.videoWidth > 0 && video.videoHeight > 0) setVideoRatio(`${video.videoWidth} / ${video.videoHeight}`);
-                if (Number.isFinite(video.duration) && video.duration > MAX_VIDEO_SECONDS) {
-                  setVideoFailed(true);
-                  setVideoReady(true);
-                  video.pause();
-                  return;
-                }
-
                 // Try autoplay with sound first. Browsers may block it; if so, fall back to muted autoplay.
                 video.muted = false;
                 try {
