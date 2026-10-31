@@ -4,7 +4,7 @@ import IntroLoader from "@/components/intro-loader";
 
 export const metadata: Metadata = {
   title: "ArulKit Store — Digital Products",
-  description: "Source code, website templates, bot projects, scraper scripts, and developer tools.",
+  description: "Source code, website templates, bot projects, and scraper script.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://store.arulkit.my.id")
 };
 
