@@ -39,7 +39,7 @@ function LoginContent() {
 
       if (mode === "signup") {
         setMessage(
-          "Pendaftaran berhasil. Cek email untuk verifikasi jika diminta."
+          "Pendaftaran berhasil. Silahkan login kembali."
         );
       } else {
         router.push(params.get("next") || "/");
@@ -100,11 +100,11 @@ function LoginContent() {
           </a>
 
           <h1 className="mt-8 text-2xl font-extrabold">
-            {mode === "login" ? "Masuk ke akun lu" : "Bikin akun baru"}
+            {mode === "login" ? "Masuk ke akun anda" : "Bikin akun baru"}
           </h1>
 
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            Masuk untuk mengelola pesanan dan mengakses produk digital yang
+            Login untuk mengelola pesanan dan mengakses produk digital yang
             sudah dibeli.
           </p>
 
@@ -133,7 +133,7 @@ function LoginContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 font-normal outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
-                placeholder="nama@email.com"
+                placeholder="nama@gmail.com"
               />
             </label>
 
@@ -156,7 +156,7 @@ function LoginContent() {
               className="btn-primary w-full rounded-xl px-4 py-3.5 text-sm font-extrabold disabled:opacity-50"
             >
               {busy
-                ? "Memproses..."
+                ? "Sedang Diproses..."
                 : mode === "login"
                   ? "Masuk"
                   : "Daftar"}
@@ -204,7 +204,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <main className="hero-bg flex min-h-screen items-center justify-center px-4">
-          <p className="text-sm text-slate-500">Memuat halaman login...</p>
+          <p className="text-sm text-slate-500">Lagi load halaman login...</p>
         </main>
       }
     >
