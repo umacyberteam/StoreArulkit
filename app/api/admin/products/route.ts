@@ -24,16 +24,33 @@ export async function POST(request: Request) {
     return Response.json({ error: "Nama, kategori, dan harga yang valid wajib diisi." }, { status: 400 });
   }
   if (!(file instanceof File) || file.size === 0) {
-    return Response.json({ error: "Pilih file ZIP produk terlebih dahulu." }, { status: 400 });
+    return Response.json({ error: "Pilih file produk terlebih dahulu." }, { status: 400 });
   }
-  if (!file.name.toLowerCase().endsWith(".zip") || file.size > 100 * 1024 * 1024) {
-    return Response.json({ error: "File harus ZIP dan ukurannya maksimal 100 MB." }, { status: 400 });
+
+  const extension = file.name.toLowerCase().split(".").pop() ?? "";
+  const allowedTypes: Record<string, string> = {
+    zip: "application/zip",
+    js: "text/javascript",
+    ts: "text/plain",
+    py: "text/x-python",
+    html: "text/html",
+    css: "text/css",
+    json: "application/json",
+    txt: "text/plain",
+  };
+  const contentType = allowedTypes[extension];
+
+  if (!contentType) {
+    return Response.json({ error: "Format file tidak didukung. Gunakan ZIP, JS, TS, PY, HTML, CSS, JSON, atau TXT." }, { status: 400 });
+  }
+  if (file.size > 100 * 1024 * 1024) {
+    return Response.json({ error: "Ukuran file maksimal 100 MB." }, { status: 400 });
   }
 
   const slug = `${title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${crypto.randomUUID().slice(0, 8)}`;
-  const filePath = `${auth.user!.id}/${crypto.randomUUID()}.zip`;
+  const filePath = `${auth.user!.id}/${crypto.randomUUID()}.${extension}`;
   const { error: uploadError } = await auth.supabase.storage.from("product-files").upload(filePath, file, {
-    contentType: "application/zip", upsert: false,
+    contentType, upsert: false,
   });
   if (uploadError) return Response.json({ error: `Upload gagal: ${uploadError.message}` }, { status: 500 });
 
