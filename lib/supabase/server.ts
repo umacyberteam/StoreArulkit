@@ -15,7 +15,6 @@ export function createServerSupabase() {
         try {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
         } catch {
-          // Server Components tidak dapat menulis cookie; Route Handler tetap dapat melakukannya.
         }
       },
     },
