@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -18,6 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import { formatIDR, type Product } from "@/lib/products";
+import { createClient } from "@/lib/supabase";
 
 const iconMap = {
   code: Code2,
@@ -39,6 +40,23 @@ export default function Storefront() {
   const [query, setQuery] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const [selected, setSelected] = useState<Product | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUserEmail(session?.user?.email ?? null);
+      },
+    );
+
+    return () => authListener.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -119,16 +137,16 @@ export default function Storefront() {
 
           <div className="hidden items-center gap-3 md:flex">
             <a
-              href="/login"
+              href={userEmail ? "/profile" : "/login"}
               className="rounded-xl px-4 py-2.5 text-sm font-bold hover:bg-slate-100"
             >
-              Masuk
+              {userEmail ? "Profil" : "Masuk"}
             </a>
             <a
               href="#produk"
               className="btn-primary rounded-xl px-5 py-3 text-sm font-bold"
             >
-              Jelajahi Produk <ArrowRight className="ml-2 inline" size={16} />
+              Lihat Koleksi <ArrowRight className="ml-2 inline" size={16} />
             </a>
           </div>
 
@@ -145,7 +163,12 @@ export default function Storefront() {
           <div className="container grid gap-3 pb-4 text-sm font-semibold md:hidden">
             <a href="#produk" onClick={() => setMobileMenu(false)}>Produk</a>
             <a href="#keunggulan" onClick={() => setMobileMenu(false)}>Keunggulan</a>
-            <a href="/login">Masuk / Daftar</a>
+            <a
+              href={userEmail ? "/profile" : "/login"}
+              onClick={() => setMobileMenu(false)}
+            >
+              {userEmail ? "Profil" : "Masuk atau Daftar"}
+            </a>
           </div>
         )}
       </header>
@@ -154,16 +177,16 @@ export default function Storefront() {
         <div className="container grid min-h-[570px] items-center gap-10 py-16 md:grid-cols-[1.08fr_.92fr] md:py-20">
           <div className="relative z-10">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white px-4 py-2 text-xs font-bold text-violet shadow-sm">
-              <Sparkles size={15} /> SOURCE CODE • DIGITAL PRODUCTS
+              <Sparkles size={15} /> SOURCE CODE • DIGITAL SOLUTIONS
             </div>
 
             <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.12] tracking-[-.045em] sm:text-5xl lg:text-[62px]">
-              Ide digital lu, <span className="text-violet">mulai dari sini.</span>
+              Wujudkan ide digital Anda, <span className="text-violet">mulai bersama ArulKit.</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-500 sm:text-lg">
-              Temukan source code, template website, bot, dan tools developer
-              yang bisa langsung lu pelajari dan kembangkan.
+              Temukan koleksi source code, template website, bot, dan perangkat
+              digital yang dirancang untuk mendukung pengembangan proyek Anda.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -171,25 +194,25 @@ export default function Storefront() {
                 href="#produk"
                 className="btn-primary rounded-xl px-6 py-4 text-sm font-bold"
               >
-                Lihat katalog <ArrowRight className="ml-2 inline" size={17} />
+                Jelajahi Katalog <ArrowRight className="ml-2 inline" size={17} />
               </a>
               <a
                 href="#keunggulan"
                 className="rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-bold text-slate-700 hover:border-violet-200"
               >
-                Kenapa ArulKit?
+                Tentang ArulKit
               </a>
             </div>
 
             <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-500">
               <span className="flex items-center gap-2">
-                <Check size={16} className="text-emerald-500" /> File digital
+                <Check size={16} className="text-emerald-500" /> Produk Digital
               </span>
               <span className="flex items-center gap-2">
-                <Check size={16} className="text-emerald-500" /> Akses setelah pembayaran
+                <Check size={16} className="text-emerald-500" /> Akses Digital Instan
               </span>
               <span className="flex items-center gap-2">
-                <Check size={16} className="text-emerald-500" /> Developer-friendly
+                <Check size={16} className="text-emerald-500" /> Dirancang untuk Developer
               </span>
             </div>
           </div>
@@ -202,7 +225,7 @@ export default function Storefront() {
                   <p className="text-xs font-bold uppercase tracking-[.16em] text-slate-400">
                     ArulKit Library
                   </p>
-                  <h3 className="mt-1 text-lg font-extrabold">Paket pilihan</h3>
+                  <h3 className="mt-1 text-lg font-extrabold">Koleksi Unggulan</h3>
                 </div>
                 <span className="rounded-xl bg-violet-50 p-3 text-violet">
                   <FileArchive size={22} />
@@ -254,10 +277,10 @@ export default function Storefront() {
                 </span>
                 <span>
                   <b className="block text-sm">
-                    Digital, praktis, siap dikembangkan
+                    Solusi Digital untuk Berbagai Kebutuhan
                   </b>
                   <span className="mt-1 block text-xs text-slate-500">
-                    Source code + dokumentasi produk
+                    Source code lengkap dengan dokumentasi produk
                   </span>
                 </span>
                 <ArrowDownRight className="ml-auto text-violet" size={20} />
@@ -271,14 +294,14 @@ export default function Storefront() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-[.2em] text-violet">
-              Katalog produk
+              Katalog Produk
             </span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Cari bahan buat proyek lu.
+              Temukan Solusi untuk Proyek Anda.
             </h2>
             <p className="mt-3 max-w-xl leading-7 text-slate-500">
-              Pilih file digital sesuai kebutuhan. Produk dan harga ditampilkan
-              langsung dari katalog Supabase.
+              Jelajahi berbagai produk digital yang tersedia. Informasi produk
+              dan harga diperbarui langsung berdasarkan katalog resmi ArulKit Store.
             </p>
           </div>
 
@@ -290,7 +313,7 @@ export default function Storefront() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Cari produk..."
+              placeholder="Cari produk berdasarkan nama atau kategori..."
               className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm outline-none focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
             />
           </div>
@@ -357,7 +380,7 @@ export default function Storefront() {
                     onClick={() => setSelected(p)}
                     className="btn-primary rounded-xl px-4 py-3 text-sm font-bold"
                   >
-                    Detail <ArrowRight className="ml-1 inline" size={15} />
+                    Lihat Detail <ArrowRight className="ml-1 inline" size={15} />
                   </button>
                 </div>
               </article>
@@ -367,7 +390,7 @@ export default function Storefront() {
 
         {filtered.length === 0 && (
           <div className="rounded-2xl border border-dashed p-10 text-center text-slate-500">
-            Produk tidak ditemukan. Coba kata kunci lain.
+            Produk tidak ditemukan. Silakan gunakan kata kunci atau kategori lainnya.
           </div>
         )}
       </section>
@@ -379,14 +402,14 @@ export default function Storefront() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs font-extrabold uppercase tracking-[.2em] text-violet">
-              Dibuat untuk developer
+              DIBUAT UNTUK DEVELOPER
             </span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Lebih sedikit ribet. Lebih banyak ngoding.
+              Fokus pada Pengembangan, Tanpa Proses yang Rumit.
             </h2>
             <p className="mt-4 leading-7 text-slate-500">
-              Alur toko dibuat sederhana supaya lu bisa fokus ke proyek, bukan
-              berantem sama proses belanja.
+              Setiap proses dirancang agar sederhana dan efisien, sehingga Anda
+              dapat lebih fokus mengembangkan proyek.
             </p>
           </div>
 
@@ -394,18 +417,18 @@ export default function Storefront() {
             {[
               {
                 icon: Download,
-                title: "Unduhan digital",
-                desc: "Akses file produk setelah pembayaran berhasil diverifikasi.",
+                title: "Akses Produk Digital",
+                desc: "File produk dapat diakses setelah pembayaran berhasil diverifikasi oleh sistem.",
               },
               {
                 icon: ShieldCheck,
-                title: "Transaksi tervalidasi",
-                desc: "Pembayaran diproses melalui backend dan status transaksi dicatat.",
+                title: "Transaksi Terverifikasi",
+                desc: "Setiap pembayaran diproses melalui sistem backend dengan pencatatan status transaksi.",
               },
               {
                 icon: Code2,
-                title: "Fokus ke source code",
-                desc: "Produk dikelompokkan untuk website, bot, scraper, dan tools.",
+                title: "Solusi untuk Developer",
+                desc: "Tersedia berbagai produk digital, mulai dari source code website, bot, scraper, hingga perangkat pengembangan lainnya.",
               },
             ].map(({ icon: Icon, title, desc }) => (
               <div
@@ -430,30 +453,31 @@ export default function Storefront() {
               FAQ
             </span>
             <h2 className="mt-3 text-3xl font-extrabold">
-              Pertanyaan umum.
+              Pertanyaan yang Sering Diajukan.
             </h2>
             <p className="mt-4 leading-7 text-slate-500">
-              Hal dasar sebelum lu checkout. Baca dulu, jangan modal pencet.
+              Temukan informasi penting mengenai produk, pembayaran, dan akses
+              pembelian sebelum melakukan transaksi.
             </p>
           </div>
 
           <div className="space-y-3">
             {[
               [
-                "File yang dijual bentuk apa?",
-                "Fokus utama toko ini adalah file ZIP berisi source code, template, bot, atau tools.",
+                "Apa saja jenis produk yang tersedia?",
+                "ArulKit Store menyediakan berbagai produk digital berupa file ZIP yang mencakup source code, template website, bot, scraper, dan perangkat pengembangan lainnya.",
               ],
               [
-                "Kapan file bisa diunduh?",
-                "Setelah pembayaran dikonfirmasi oleh server. File tersedia melalui akses unduhan yang aman.",
+                "Kapan produk dapat diunduh?",
+                "Produk dapat diunduh setelah pembayaran berhasil dikonfirmasi oleh sistem melalui akses unduhan yang telah disediakan.",
               ],
               [
-                "Bisa login pakai Google?",
-                "Bisa setelah Supabase Auth dan Google OAuth dikonfigurasi.",
+                "Apakah tersedia login menggunakan Google?",
+                "Ya. Anda dapat menggunakan akun Google apabila layanan autentikasi Google telah tersedia dan dikonfigurasi.",
               ],
               [
-                "Harga di katalog ini sudah final?",
-                "Harga dan item mengikuti data produk yang dimasukkan admin melalui dashboard.",
+                "Bagaimana informasi harga produk diperbarui?",
+                "Informasi harga dan ketersediaan produk mengikuti data terbaru yang dikelola oleh administrator melalui dashboard.",
               ],
             ].map(([q, a]) => (
               <details
@@ -480,7 +504,7 @@ export default function Storefront() {
             <div>
               <b className="brand">ArulKit Store</b>
               <p className="mt-1 text-xs text-slate-400">
-                Digital products for builders.
+                Digital Solutions for Developers.
               </p>
             </div>
           </div>
@@ -547,12 +571,16 @@ export default function Storefront() {
               </span>
 
               <a
-                href={`/login?next=${encodeURIComponent(
-                  `/checkout?product=${selected.id}`,
-                )}`}
+                href={
+                  userEmail
+                    ? `/checkout?product=${selected.id}`
+                    : `/login?next=${encodeURIComponent(
+                        `/checkout?product=${selected.id}`,
+                      )}`
+                }
                 className="btn-primary rounded-xl px-5 py-3 text-sm font-bold"
               >
-                Login untuk beli{" "}
+                {userEmail ? "Lanjutkan Pembelian" : "Masuk untuk Melanjutkan"}{" "}
                 <ArrowRight className="ml-1 inline" size={15} />
               </a>
             </div>
